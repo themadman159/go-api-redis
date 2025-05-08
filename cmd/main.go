@@ -22,13 +22,18 @@ func main() {
 		log.Fatalf("Error initializing database: %v", err)
 	}
 
+	redis, rerr := database.InitRedisDatabase()
+	if rerr != nil {
+		log.Fatalf("Error initializing Redis: %v", err)
+	}
+
 	if err := database.Migration(db); err != nil {
 		log.Fatalf("Error migrating database: %v", err)
 	}
 
 	app := fiber.New()
 
-	routes.InitRoutes(app, db)
+	routes.InitRoutes(app, db, redis)
 
 	app.Listen(":" + serverconfig.ServerConfig().PORT)
 }
